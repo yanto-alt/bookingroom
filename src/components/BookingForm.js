@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, Users, FileText } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function BookingForm({ rooms, userId }) {
     const router = useRouter();
@@ -36,10 +37,26 @@ export default function BookingForm({ rooms, userId }) {
                 throw new Error(error.message || "Gagal membuat pemesanan");
             }
 
-            router.push("/");
+            // Show success popup
+            await Swal.fire({
+                title: "Permintaan Berhasil!",
+                text: "Permintaan pemesanan ruang meeting Anda telah berhasil dikirim.",
+                icon: "success",
+                confirmButtonColor: "#325CA8", // primary color
+                confirmButtonText: "OK",
+            });
+
+            // Redirect to Meeting Room Dashboard
+            router.push("/rooms");
             router.refresh();
         } catch (err) {
             setError(err.message);
+            Swal.fire({
+                title: "Gagal!",
+                text: err.message,
+                icon: "error",
+                confirmButtonColor: "#EF4444",
+            });
         } finally {
             setLoading(false);
         }

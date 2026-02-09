@@ -86,8 +86,8 @@ export default function CalendarView({ bookings, rooms }) {
                             <div
                                 key={day.toString()}
                                 className={`min-h-[120px] p-2 rounded-lg border transition-all ${isCurrentDay
-                                        ? "border-primary bg-blue-50"
-                                        : "border-gray-200 bg-white hover:border-primary hover:shadow-md"
+                                    ? "border-primary bg-blue-50"
+                                    : "border-gray-200 bg-white hover:border-primary hover:shadow-md"
                                     }`}
                             >
                                 <div className={`text-sm font-semibold mb-1 ${isCurrentDay ? "text-primary" : "text-text-dark"}`}>
@@ -97,15 +97,20 @@ export default function CalendarView({ bookings, rooms }) {
                                     {dayBookings.slice(0, 3).map((booking) => (
                                         <div
                                             key={booking.id}
-                                            className={`text-xs p-1 rounded ${booking.status === "APPROVED"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-yellow-100 text-yellow-700"
+                                            className={`text-xs p-1.5 rounded ${booking.status === "APPROVED"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-yellow-100 text-yellow-700"
                                                 }`}
-                                            title={`${booking.title} - ${booking.room.name}`}
+                                            title={`${booking.title} - ${booking.room.name} (${booking.user.name})`}
                                         >
                                             <div className="font-semibold truncate">{booking.title}</div>
+                                            <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
+                                                <User size={10} className="inline" />
+                                                {booking.user?.name || "User"}
+                                            </div>
                                             <div className="text-[10px] truncate">{booking.room.name}</div>
-                                            <div className="text-[10px]">
+                                            <div className="text-[10px] flex items-center gap-1">
+                                                <Clock size={10} />
                                                 {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
                                             </div>
                                         </div>

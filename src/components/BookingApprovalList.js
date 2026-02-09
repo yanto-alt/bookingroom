@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, XCircle, Calendar, Clock, User, MapPin, Edit2 } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import Swal from "sweetalert2";
 
 export default function BookingApprovalList({ bookings, allRooms }) {
     const router = useRouter();
@@ -26,28 +27,80 @@ export default function BookingApprovalList({ bookings, allRooms }) {
                 throw new Error(error.message || "Gagal memproses permintaan");
             }
 
+            await Swal.fire({
+                title: status === 'APPROVED' ? "Disetujui!" : "Ditolak!",
+                text: `Permintaan telah berhasil ${status === 'APPROVED' ? 'disetujui' : 'ditolak'}.`,
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
             setEditingRoom(null);
             router.refresh();
         } catch (error) {
-            alert(error.message);
+            Swal.fire({
+                title: "Gagal!",
+                text: error.message,
+                icon: "error"
+            });
         } finally {
             setLoading(null);
         }
     };
 
-    const handleReject = (bookingId) => {
-        const notes = prompt("Alasan penolakan (opsional):");
-        if (notes !== null) {
-            handleApproval(bookingId, "REJECTED", notes);
+    const confirmAction = async (bookingId, action) => {
+        const isApprove = action === 'approve';
+
+        const result = await Swal.fire({
+            title: isApprove ? 'Setujui Permintaan?' : 'Tolak Permintaan?',
+            text: isApprove ? "Tambahkan pesan untuk pemohon (opsional)" : "Wajib sertakan alasan penolakan",
+            input: "textarea",
+            inputPlaceholder: isApprove ? "Catatan tambahan..." : "Alasan penolakan...",
+            inputAttributes: {
+                rows: "3",
+                "aria-label": isApprove ? "Catatan tambahan" : "Alasan penolakan"
+            },
+            showCancelButton: true,
+            confirmButtonColor: isApprove ? "#22c55e" : "#ef4444",
+            confirmButtonText: isApprove ? "Ya, Setujui" : "Ya, Tolak",
+            cancelButtonText: "Batal",
+            showLoaderOnConfirm: true,
+            preConfirm: (notes) => {
+                if (!isApprove && !notes) {
+                    Swal.showValidationMessage('Alasan penolakan wajib diisi');
+                    return false;
+                }
+                return notes;
+            }
+        });
+
+        if (result.isConfirmed) {
+            handleApproval(bookingId, isApprove ? "APPROVED" : "REJECTED", result.value);
         }
     };
 
     const handleChangeRoom = (bookingId) => {
         if (!selectedRoom) {
-            alert("Pilih ruangan terlebih dahulu");
+            Swal.fire("Pilih Ruangan!", "Silakan pilih ruangan pengganti terlebih dahulu.", "warning");
             return;
         }
-        handleApproval(bookingId, "APPROVED", "Ruangan diganti oleh admin", selectedRoom);
+
+        // Confirm room change
+        Swal.fire({
+            title: 'Ganti Ruangan & Setujui?',
+            text: "Tambahkan pesan untuk pemohon (opsional)",
+            input: "textarea",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Ganti & Setujui",
+            confirmButtonColor: "#3b82f6",
+            preConfirm: (notes) => {
+                return notes;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleApproval(bookingId, "APPROVED", result.value, selectedRoom);
+            }
+        });
     };
 
     const startEditRoom = (bookingId, currentRoomId) => {
@@ -141,7 +194,7 @@ export default function BookingApprovalList({ bookings, allRooms }) {
                         ) : (
                             <>
                                 <button
-                                    onClick={() => handleReject(booking.id)}
+                                    onClick={() => confirmAction(booking.id, 'reject')}
                                     disabled={loading === booking.id}
                                     className="flex-1 px-4 py-2 rounded-lg border border-red-300 text-red-600 font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
@@ -149,7 +202,7 @@ export default function BookingApprovalList({ bookings, allRooms }) {
                                     Tolak
                                 </button>
                                 <button
-                                    onClick={() => handleApproval(booking.id, "APPROVED")}
+                                    onClick={() => confirmAction(booking.id, 'approve')}
                                     disabled={loading === booking.id}
                                     className="flex-1 btn-primary px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
                                 >
