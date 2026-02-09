@@ -17,6 +17,10 @@ export default function VehicleHistoryList({ bookings }) {
                         <p className="text-sm text-gray-600 font-medium">
                             {format(new Date(booking.startTime), "EEEE, d MMMM yyyy HH:mm", { locale: id })} - {format(new Date(booking.endTime), "HH:mm", { locale: id })}
                         </p>
+                        <p className="text-xs text-text-light flex items-center gap-1 mt-1 mb-2">
+                            <User size={12} />
+                            <span className="font-semibold text-gray-700">Pemohon:</span> {booking.user?.name}
+                        </p>
                         <div className="flex flex-col gap-1 mt-1 bg-gray-50 p-2 rounded border border-gray-100">
                             <p className="text-xs text-text-light flex items-center gap-1">
                                 <span className="font-semibold text-gray-700">Driver:</span> {booking.vehicle.driverName || "Tidak ditentukan"}

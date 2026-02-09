@@ -33,7 +33,6 @@ async function main() {
             username: 'pengelola',
             name: 'Pengelola User',
             password: pengelolaPassword,
-            role: 'PENGELOLA',
         },
     })
 

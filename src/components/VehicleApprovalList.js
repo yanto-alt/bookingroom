@@ -71,11 +71,6 @@ export default function VehicleApprovalList({ bookings }) {
             if (res.ok) {
                 const data = await res.json();
                 setAvailableVehicles(data);
-
-                // If original vehicle is not in "available" (maybe it's maintenance or whatever), 
-                // but usually it should be because this booking is the one using it (hence excludeBookingId).
-                // If we want to allow keeping the same vehicle even if it's "unavailable" due to this booking, 
-                // the API should handle that.
             }
         } catch (error) {
             console.error("Failed to fetch vehicles", error);
@@ -102,32 +97,40 @@ export default function VehicleApprovalList({ bookings }) {
                 {bookings.map((booking) => (
                     <div key={booking.id} className="p-6 hover:bg-gray-50 transition-colors">
                         <div className="flex items-start justify-between">
-                            <div className="space-y-1">
+                            <div className="space-y-1 w-full">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
                                         }`}>
                                         {booking.status}
                                     </span>
                                 </div>
+
                                 <div className="text-sm text-gray-600 space-y-1.5 mt-2">
                                     <p className="flex items-center gap-2">
                                         <Clock size={16} className="text-gray-400" />
                                         {new Date(booking.startTime).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })} - {new Date(booking.endTime).toLocaleString('id-ID', { timeStyle: 'short' })}
                                     </p>
+                                    <p className="flex items-center gap-2 font-medium text-gray-900">
+                                        <User size={16} className="text-gray-400" />
+                                        Pemohon: {booking.user?.name}
+                                    </p>
                                     <p className="flex items-center gap-2">
                                         <MapPin size={16} className="text-gray-400" />
                                         Tujuan: <span className="font-medium text-text-dark">{booking.destination}</span>
                                     </p>
+
                                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 mt-2">
                                         <p className="text-xs text-text-light uppercase font-bold tracking-wider mb-1">Keperluan</p>
                                         <p className="text-sm text-text-dark">{booking.purpose}</p>
                                     </div>
+
                                     {booking.adminNotes && (
                                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 mt-2 italic">
                                             <p className="text-xs text-text-light font-bold mb-1 uppercase tracking-wider">Catatan Admin</p>
                                             <p className="text-sm text-gray-700">{booking.adminNotes}</p>
                                         </div>
                                     )}
+
                                     {booking.driverRequired && (
                                         <p className="text-blue-600 font-semibold flex items-center gap-1 mt-2">
                                             <User size={14} /> Butuh Supir {booking.vehicle.driverName && `(Driver: ${booking.vehicle.driverName})`}
@@ -136,7 +139,7 @@ export default function VehicleApprovalList({ bookings }) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 ml-4">
                                 {booking.status === "PENDING" ? (
                                     <>
                                         <button

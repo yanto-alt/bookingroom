@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns";
 import { id } from "date-fns/locale";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, User } from "lucide-react";
 
 export default function VehicleCalendarView({ bookings, vehicles }) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -111,6 +111,10 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
                                             title={`${booking.purpose} - ${booking.vehicle.name} (${booking.vehicle.licensePlate})`}
                                         >
                                             <div className="font-semibold truncate">{booking.purpose}</div>
+                                            <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
+                                                <User size={10} className="inline" />
+                                                {booking.user?.name || "User"}
+                                            </div>
                                             <div className="text-[10px] truncate">{booking.vehicle.name} ({booking.vehicle.licensePlate})</div>
                                             <div className="text-[10px]">
                                                 {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}

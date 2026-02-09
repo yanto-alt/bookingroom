@@ -20,7 +20,7 @@ export default async function VehicleDashboard() {
     // Fetch user's vehicle bookings
     const userBookings = await prisma.vehicleBooking.findMany({
         where: { userId: session.user.id },
-        include: { vehicle: true },
+        include: { vehicle: true, user: true },
         orderBy: { startTime: 'desc' },
         take: 5,
     });
