@@ -1,10 +1,9 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
@@ -87,12 +86,6 @@ model VehicleBooking {
   vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
 }
 
-enum Role {
-  USER
-  ADMIN
-  PENGELOLA_ROOM
-  PENGELOLA_VEHICLE
-}
 
 enum BookingStatus {
   PENDING

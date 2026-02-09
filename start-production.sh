@@ -15,11 +15,11 @@ sleep 10
 
 # Run migrations
 echo "🔄 Running database migrations..."
-docker-compose exec app npx prisma@6.2.1 migrate deploy
+docker-compose exec app npx prisma migrate deploy
 
 # Seed database
 echo "🌱 Seeding database..."
-docker-compose exec app npx prisma@6.2.1 db seed
+docker-compose exec app npx prisma db seed
 
 echo ""
 echo "✅ Application is ready!"
