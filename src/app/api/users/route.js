@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
     try {
         const session = await auth();

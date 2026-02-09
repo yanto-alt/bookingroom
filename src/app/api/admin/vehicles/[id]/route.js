@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request, { params }) {
     try {
         const session = await auth();
@@ -31,7 +33,7 @@ export async function PUT(request, { params }) {
                 capacity,
                 driverName,
                 description,
-                status,
+                status: status || "AVAILABLE",
             },
         });
 
@@ -58,19 +60,14 @@ export async function DELETE(request, { params }) {
         const awaitedParams = await params;
         const { id } = awaitedParams;
 
-        // Check if vehicle has bookings
-        const vehicle = await prisma.vehicle.findUnique({
-            where: { id },
-            include: {
-                _count: {
-                    select: { bookings: true },
-                },
-            },
+        // Check for existing bookings
+        const bookingsCount = await prisma.vehicleBooking.count({
+            where: { vehicleId: id }
         });
 
-        if (vehicle._count.bookings > 0) {
+        if (bookingsCount > 0) {
             return NextResponse.json(
-                { message: `Kendaraan memiliki ${vehicle._count.bookings} pemesanan. Hapus pemesanan terlebih dahulu.` },
+                { message: "Kendaraan tidak bisa dihapus karena memiliki riwayat pemesanan" },
                 { status: 400 }
             );
         }
@@ -79,7 +76,7 @@ export async function DELETE(request, { params }) {
             where: { id },
         });
 
-        return NextResponse.json({ message: "Vehicle deleted successfully" });
+        return NextResponse.json({ message: "Vehicle deleted" });
     } catch (error) {
         console.error("Delete Vehicle error:", error);
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });

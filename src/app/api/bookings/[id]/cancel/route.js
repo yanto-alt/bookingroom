@@ -2,46 +2,40 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
     try {
         const session = await auth();
-        if (!session || session.user.role !== 'ADMIN') {
+        if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { id } = await params;
+        const awaitedParams = await params;
+        const { id } = awaitedParams;
 
-        // Get the booking
+        // Check if user owns the booking or is admin
         const booking = await prisma.booking.findUnique({
             where: { id },
+            include: { user: true }
         });
 
         if (!booking) {
             return NextResponse.json({ message: "Booking not found" }, { status: 404 });
         }
 
-        if (booking.status !== 'APPROVED') {
-            return NextResponse.json(
-                { message: "Hanya pemesanan yang sudah disetujui yang bisa dibatalkan" },
-                { status: 400 }
-            );
+        if (booking.userId !== session.user.id && session.user.role !== 'ADMIN') {
+            return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 
-        // Cancel the booking
-        const cancelledBooking = await prisma.booking.update({
+        await prisma.booking.update({
             where: { id },
-            data: {
-                status: 'CANCELLED',
-                notes: 'Dibatalkan oleh admin',
-            },
+            data: { status: 'CANCELLED' }
         });
 
-        return NextResponse.json(cancelledBooking);
+        return NextResponse.json({ message: "Booking cancelled" });
     } catch (error) {
-        console.error("Booking cancellation error:", error);
-        return NextResponse.json(
-            { message: "Internal server error" },
-            { status: 500 }
-        );
+        console.error("Cancel booking error:", error);
+        return NextResponse.json({ message: "Failed to cancel booking" }, { status: 500 });
     }
 }

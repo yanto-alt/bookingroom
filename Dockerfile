@@ -14,14 +14,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate
+# Generate Prisma Client with dummy URL for build-time validation
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build Next.js
-RUN npm run build
+# Build Next.js with dummy URL and Secret to satisfy Prisma/NextAuth initialization
+RUN AUTH_SECRET="dummy_secret_for_build" DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -42,7 +42,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.js ./prisma.config.js
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY entrypoint.sh ./

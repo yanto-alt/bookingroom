@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
     try {
         const session = await auth();
@@ -9,24 +11,17 @@ export async function POST(request, { params }) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { id } = await params;
-        const body = await request.json();
-        const { status, notes } = body;
+        const awaitedParams = await params;
+        const { id } = awaitedParams;
 
-        const booking = await prisma.booking.update({
+        await prisma.booking.update({
             where: { id },
-            data: {
-                status,
-                notes: notes || null,
-            },
+            data: { status: 'APPROVED' }
         });
 
-        return NextResponse.json(booking);
+        return NextResponse.json({ message: "Booking approved" });
     } catch (error) {
-        console.error("Booking approval error:", error);
-        return NextResponse.json(
-            { message: "Internal server error" },
-            { status: 500 }
-        );
+        console.error("Approve booking error:", error);
+        return NextResponse.json({ message: "Failed to approve booking" }, { status: 500 });
     }
 }

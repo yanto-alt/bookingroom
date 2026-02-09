@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
     try {
         const session = await auth();
@@ -33,3 +35,4 @@ export async function POST(request, { params }) {
         return NextResponse.json({ message: "Failed to approve" }, { status: 500 });
     }
 }
+

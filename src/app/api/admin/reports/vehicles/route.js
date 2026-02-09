@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { endOfMonth } from "date-fns";
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
     try {
