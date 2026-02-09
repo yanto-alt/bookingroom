@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Setting" ALTER COLUMN "id" DROP DEFAULT;
