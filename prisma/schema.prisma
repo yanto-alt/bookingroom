@@ -86,6 +86,12 @@ model VehicleBooking {
   vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
 }
 
+enum Role {
+  USER
+  ADMIN
+  PENGELOLA_ROOM
+  PENGELOLA_VEHICLE
+}
 
 enum BookingStatus {
   PENDING
