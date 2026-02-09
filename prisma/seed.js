@@ -21,6 +21,22 @@ async function main() {
         },
     })
 
+    // Create Pengelola
+    const pengelolaPassword = await bcrypt.hash('pengelola123', 10)
+    await prisma.user.upsert({
+        where: { email: 'pengelola@bptapera.go.id' },
+        update: {
+            username: 'pengelola',
+        },
+        create: {
+            email: 'pengelola@bptapera.go.id',
+            username: 'pengelola',
+            name: 'Pengelola User',
+            password: pengelolaPassword,
+            role: 'PENGELOLA',
+        },
+    })
+
     // Create some Rooms
     const rooms = [
         {
