@@ -29,7 +29,9 @@ export default function Navbar({ user, signOutAction }) {
         setIsMobileMenuOpen(false);
     };
 
-    const isRoomAdmin = (user.role === 'ADMIN' || user.role === 'PENGELOLA');
+    const isAdmin = user.role === 'ADMIN';
+    const isRoomAdmin = isAdmin || user.role === 'PENGELOLA_ROOM';
+    const isVehicleAdmin = isAdmin || user.role === 'PENGELOLA_VEHICLE';
 
     return (
         <nav className="glass-card sticky top-4 mx-4 my-2 z-50 px-6 py-3">
@@ -98,7 +100,7 @@ export default function Navbar({ user, signOutAction }) {
                                 </Link>
 
                                 {/* Vehicle Admin Links */}
-                                {isRoomAdmin && (
+                                {isVehicleAdmin && (
                                     <>
                                         <Link href="/admin/approvals/vehicles" className="flex items-center gap-2 text-text-dark hover:text-primary transition-colors">
                                             <CheckCircle size={18} /> Konfirmasi
@@ -106,13 +108,16 @@ export default function Navbar({ user, signOutAction }) {
                                         <Link href="/admin/vehicles" className="flex items-center gap-2 text-text-dark hover:text-primary transition-colors">
                                             <Car size={18} /> Kelola Kendaraan
                                         </Link>
+                                        <Link href="/admin/reports/vehicles" className="flex items-center gap-2 text-text-dark hover:text-primary transition-colors">
+                                            <PieChart size={18} /> Laporan
+                                        </Link>
                                     </>
                                 )}
                             </>
                         )}
 
                         {/* Global Admin Links (Settings, Users) - Show in both contexts if Admin */}
-                        {user.role === 'ADMIN' && (context === "ROOMS" || context === "VEHICLES") && (
+                        {isAdmin && (context === "ROOMS" || context === "VEHICLES") && (
                             <>
                                 <Link href="/admin/users" className="flex items-center gap-2 text-text-dark hover:text-primary transition-colors">
                                     <Users size={18} /> Users
@@ -193,7 +198,7 @@ export default function Navbar({ user, signOutAction }) {
                                 <Link href="/vehicles/calendar" onClick={closeMenu} className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 text-text-dark hover:text-primary transition-colors">
                                     <Calendar size={20} /> Jadwal
                                 </Link>
-                                {isRoomAdmin && (
+                                {isVehicleAdmin && (
                                     <>
                                         <div className="text-xs font-semibold text-gray-400 mt-2 pl-2">ADMIN KENDARAAN</div>
                                         <Link href="/admin/approvals/vehicles" onClick={closeMenu} className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 text-text-dark hover:text-primary transition-colors">
@@ -201,6 +206,9 @@ export default function Navbar({ user, signOutAction }) {
                                         </Link>
                                         <Link href="/admin/vehicles" onClick={closeMenu} className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 text-text-dark hover:text-primary transition-colors">
                                             <Car size={20} /> Kelola Kendaraan
+                                        </Link>
+                                        <Link href="/admin/reports/vehicles" onClick={closeMenu} className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 text-text-dark hover:text-primary transition-colors">
+                                            <PieChart size={20} /> Laporan
                                         </Link>
                                     </>
                                 )}

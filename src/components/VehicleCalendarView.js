@@ -18,9 +18,16 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
     );
 
     const getBookingsForDay = (day) => {
-        return filteredBookings.filter((booking) =>
-            isSameDay(new Date(booking.startTime), day)
-        );
+        return filteredBookings.filter((booking) => {
+            const start = new Date(booking.startTime);
+            const end = new Date(booking.endTime);
+            // Normalize dates to start of day for comparison
+            const checkDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+            const bookingStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+            const bookingEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+            return checkDay >= bookingStart && checkDay <= bookingEnd;
+        });
     };
 
     const previousMonth = () => {
@@ -101,10 +108,10 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-yellow-100 text-yellow-700"
                                                 }`}
-                                            title={`${booking.purpose} - ${booking.vehicle.name}`}
+                                            title={`${booking.purpose} - ${booking.vehicle.name} (${booking.vehicle.licensePlate})`}
                                         >
                                             <div className="font-semibold truncate">{booking.purpose}</div>
-                                            <div className="text-[10px] truncate">{booking.vehicle.name}</div>
+                                            <div className="text-[10px] truncate">{booking.vehicle.name} ({booking.vehicle.licensePlate})</div>
                                             <div className="text-[10px]">
                                                 {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
                                             </div>

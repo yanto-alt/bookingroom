@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,60 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-  PENGELOLA
-}
-
-enum BookingStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  CANCELLED
-}
-
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  username      String?   @unique
-  email         String    @unique
-  password      String?
-  role          Role      @default(USER)
-  isLdap        Boolean   @default(false)
-  bookings      Booking[]
+  id              String           @id @default(cuid())
+  name            String?
+  email           String           @unique
+  password        String?
+  role            Role             @default(USER)
+  isLdap          Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  username        String?          @unique
+  bookings        Booking[]
   vehicleBookings VehicleBooking[]
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 model Room {
-  id           String    @id @default(cuid())
-  name         String
-  description  String?
-  capacity     Int
-  facilities   String[]
-  image        String?
-  bookings     Booking[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  capacity    Int
+  facilities  String[]
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
 }
 
 model Booking {
   id          String        @id @default(cuid())
   userId      String
-  user        User          @relation(fields: [userId], references: [id])
   roomId      String
-  room        Room          @relation(fields: [roomId], references: [id])
   title       String
   startTime   DateTime
   endTime     DateTime
   description String?
   status      BookingStatus @default(PENDING)
-  notes       String?       // For admin rejection reasons or special requests
+  notes       String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  room        Room          @relation(fields: [roomId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
 }
 
 model Setting {
@@ -73,25 +56,24 @@ model Setting {
 }
 
 model Vehicle {
-  id            String           @id @default(cuid())
-  name          String
-  type          String           // "Minibus", "SUV", "Sedan", etc.
-  licensePlate  String           @unique
-  capacity      Int
-  image         String?
-  description   String?
-  status        String           @default("AVAILABLE") // AVAILABLE, MAINTENANCE, IN_USE
-  bookings      VehicleBooking[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id           String           @id @default(cuid())
+  name         String
+  type         String
+  licensePlate String           @unique
+  capacity     Int
+  image        String?
+  description  String?
+  status       String           @default("AVAILABLE")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  driverName   String?
+  bookings     VehicleBooking[]
 }
 
 model VehicleBooking {
   id             String        @id @default(cuid())
   userId         String
-  user           User          @relation(fields: [userId], references: [id])
   vehicleId      String
-  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
   startTime      DateTime
   endTime        DateTime
   purpose        String
@@ -101,4 +83,20 @@ model VehicleBooking {
   adminNotes     String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  user           User          @relation(fields: [userId], references: [id])
+  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  PENGELOLA_ROOM
+  PENGELOLA_VEHICLE
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
 }

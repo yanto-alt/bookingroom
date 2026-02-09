@@ -1,12 +1,38 @@
 import Link from "next/link";
 import { Building2, Car } from "lucide-react";
+import { auth } from "@/auth";
+import LoginForm from "@/components/LoginForm";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+
+  if (!session) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="glass-card p-8 w-full max-w-md animate-in fade-in zoom-in duration-500">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <img
+                src="/logo-bptapera-full.png"
+                alt="BP TAPERA Logo"
+                className="w-40 h-40 object-contain"
+              />
+            </div>
+            <h1 className="text-2xl font-bold text-primary">Aplikasi Pemesanan</h1>
+            <p className="text-text-light mt-2 text-sm">BP TAPERA</p>
+          </div>
+
+          <LoginForm />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] fade-in">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-          Aplikasi Booking Tapera
+          Aplikasi Pemesanan BP TAPERA
         </h1>
         <p className="text-xl text-text-light">
           Sistem Pemesanan Ruang Meeting & Kendaraan Operasional

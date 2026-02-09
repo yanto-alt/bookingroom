@@ -7,7 +7,7 @@ import ApprovedBookingsList from "@/components/ApprovedBookingsList";
 export default async function AdminBookingsPage() {
     const session = await auth();
 
-    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA')) {
+    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA_ROOM')) {
         redirect("/");
     }
 

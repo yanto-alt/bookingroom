@@ -20,7 +20,7 @@ export default async function SignInPage() {
                             className="w-40 h-40 object-contain"
                         />
                     </div>
-                    <h1 className="text-2xl font-bold text-primary">Pemesanan Ruang Meeting</h1>
+                    <h1 className="text-2xl font-bold text-primary">Aplikasi Pemesanan</h1>
                     <p className="text-text-light mt-2">BP TAPERA</p>
                 </div>
 

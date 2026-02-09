@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Calendar, Plus, Car, Clock } from "lucide-react";
+import VehicleHistoryList from "@/components/VehicleHistoryList";
 
 export default async function VehicleDashboard() {
     const session = await auth();
@@ -80,29 +81,7 @@ export default async function VehicleDashboard() {
                     <Clock size={24} className="text-accent" />
                     Riwayat Pemesanan
                 </h2>
-                {userBookings.length === 0 ? (
-                    <p className="text-text-light text-center py-8">Belum ada pemesanan kendaraan</p>
-                ) : (
-                    <div className="space-y-3">
-                        {userBookings.map((booking) => (
-                            <div key={booking.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center justify-between">
-                                <div>
-                                    <h3 className="font-semibold">{booking.vehicle.name}</h3>
-                                    <p className="text-sm text-gray-600">
-                                        {new Date(booking.startTime).toLocaleString('id-ID')}
-                                    </p>
-                                    <p className="text-xs text-text-light mt-1">Tujuan: {booking.destination}</p>
-                                </div>
-                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :
-                                    booking.status === 'REJECTED' ? 'bg-red-100 text-red-600' :
-                                        'bg-yellow-100 text-yellow-600'
-                                    }`}>
-                                    {booking.status}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <VehicleHistoryList bookings={userBookings} />
             </div>
         </div>
     );

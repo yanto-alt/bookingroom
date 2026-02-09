@@ -4,8 +4,8 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
 export const metadata = {
-  title: "Pemesanan Ruang Meeting BP TAPERA",
-  description: "Internal Meeting Room Booking System",
+  title: "Aplikasi Booking BP TAPERA",
+  description: "Internal Booking System",
 };
 
 import DevToolsBlocker from "@/components/DevToolsBlocker";

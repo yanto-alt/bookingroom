@@ -5,12 +5,12 @@ import { auth } from "@/auth";
 export async function POST(request) {
     try {
         const session = await auth();
-        if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA')) {
+        if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA_VEHICLE')) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         const body = await request.json();
-        const { name, type, licensePlate, capacity, description, status } = body;
+        const { name, type, licensePlate, capacity, driverName, description, status } = body;
 
         // Validate
         if (!name || !type || !licensePlate || !capacity) {
@@ -27,6 +27,7 @@ export async function POST(request) {
                 type,
                 licensePlate,
                 capacity,
+                driverName,
                 description,
                 status: status || "AVAILABLE",
             },

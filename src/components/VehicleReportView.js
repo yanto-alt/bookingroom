@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-    PieChart,
-    BarChart,
     Calendar,
     CheckCircle,
     XCircle,
@@ -20,7 +18,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
-export default function ReportView() {
+export default function VehicleReportView() {
     const [month, setMonth] = useState(new Date().getMonth());
     const [year, setYear] = useState(new Date().getFullYear());
     const [data, setData] = useState(null);
@@ -29,13 +27,13 @@ export default function ReportView() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/admin/reports/rooms?month=${month}&year=${year}`);
+            const res = await fetch(`/api/admin/reports/vehicles?month=${month}&year=${year}`);
             if (res.ok) {
                 const result = await res.json();
                 setData(result);
             }
         } catch (error) {
-            console.error("Error fetching room report data:", error);
+            console.error("Error fetching report data:", error);
         } finally {
             setLoading(false);
         }
@@ -58,16 +56,18 @@ export default function ReportView() {
         const reportData = data.bookings.map((b) => ({
             "Tanggal": format(new Date(b.startTime), "d MMM yyyy", { locale: id }),
             "Waktu": `${format(new Date(b.startTime), "HH:mm")} - ${format(new Date(b.endTime), "HH:mm")}`,
-            "Ruangan": b.room.name,
-            "Judul": b.title,
+            "Kendaraan": `${b.vehicle.name} (${b.vehicle.licensePlate})`,
             "Pemohon": b.user.name,
+            "Tujuan": b.destination,
+            "Keperluan": b.purpose,
+            "Supir": b.driverRequired ? "Ya" : "Tidak",
             "Status": b.status
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(reportData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Ruangan");
-        XLSX.writeFile(workbook, `Laporan_Ruang_Meeting_${months[month]}_${year}.xlsx`);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Kendaraan");
+        XLSX.writeFile(workbook, `Laporan_Kendaraan_${months[month]}_${year}.xlsx`);
     };
 
     const handleExportPDF = () => {
@@ -76,17 +76,17 @@ export default function ReportView() {
         const doc = new jsPDF();
 
         doc.setFontSize(16);
-        doc.text("Laporan Penggunaan Ruang Meeting", 14, 20);
+        doc.text("Laporan Penggunaan Kendaraan Operasional", 14, 20);
         doc.setFontSize(11);
         doc.text(`Periode: ${months[month]} ${year}`, 14, 30);
         doc.text(`BP TAPERA`, 14, 37);
 
-        const tableColumn = ["Tanggal", "Ruangan", "Judul", "Pemohon", "Status"];
+        const tableColumn = ["Tanggal", "Kendaraan", "Pemohon", "Tujuan", "Status"];
         const tableRows = data.bookings.map(b => [
             format(new Date(b.startTime), "d MMM yyyy", { locale: id }),
-            b.room.name,
-            b.title,
+            `${b.vehicle.name} (${b.vehicle.licensePlate})`,
             b.user.name,
+            b.destination,
             b.status
         ]);
 
@@ -95,16 +95,11 @@ export default function ReportView() {
             body: tableRows,
             startY: 45,
             theme: 'grid',
-            headStyles: { fillColor: [21, 128, 61] } // green-700 (primary style)
+            headStyles: { fillColor: [16, 185, 129] } // emerald-500
         });
 
-        doc.save(`Laporan_Ruang_Meeting_${months[month]}_${year}.pdf`);
+        doc.save(`Laporan_Kendaraan_${months[month]}_${year}.pdf`);
     };
-
-    const roomUsage = data?.rooms?.map((room) => ({
-        name: room.name,
-        count: room._count.bookings,
-    })).sort((a, b) => b.count - a.count) || [];
 
     return (
         <div className="space-y-6">
@@ -205,46 +200,16 @@ export default function ReportView() {
                         </div>
                     </div>
 
-                    {/* Room Usage */}
-                    <div className="glass-card p-6">
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <BarChart size={24} className="text-primary" />
-                            Popularitas Ruangan
-                        </h2>
-                        <div className="space-y-3">
-                            {roomUsage.map((room, idx) => {
-                                const percentage = data.stats.total > 0
-                                    ? (room.count / data.stats.total * 100).toFixed(1)
-                                    : 0;
-                                return (
-                                    <div key={idx}>
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className="text-sm font-medium">{room.name}</span>
-                                            <span className="text-sm text-text-light">{room.count} pemesanan ({percentage}%)</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                            <div
-                                                className="bg-primary h-2 rounded-full transition-all"
-                                                style={{ width: `${percentage}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            {roomUsage.length === 0 && <p className="text-text-light text-sm">Tidak ada data ruangan.</p>}
-                        </div>
-                    </div>
-
                     {/* Report Table */}
                     <div className="glass-card p-6 overflow-hidden">
                         <div className="flex items-center gap-2 mb-6">
                             <TableIcon className="text-primary" size={24} />
-                            <h2 className="text-xl font-bold">Rincian Pemesanan</h2>
+                            <h2 className="text-xl font-bold">Rincian Penggunaan</h2>
                         </div>
 
                         {data?.bookings.length === 0 ? (
                             <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                <p className="text-text-light mt-2">Tidak ada data pemesanan pada periode ini.</p>
+                                <p className="text-text-light mt-2">Tidak ada data penggunaan kendaraan pada periode ini.</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -252,9 +217,9 @@ export default function ReportView() {
                                     <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
                                         <tr>
                                             <th className="px-4 py-3 text-sm">Tanggal</th>
-                                            <th className="px-4 py-3 text-sm">Ruangan</th>
-                                            <th className="px-4 py-3 text-sm">Judul Agenda</th>
+                                            <th className="px-4 py-3 text-sm">Kendaraan</th>
                                             <th className="px-4 py-3 text-sm">Pemohon</th>
+                                            <th className="px-4 py-3 text-sm">Tujuan</th>
                                             <th className="px-4 py-3 text-sm">Status</th>
                                         </tr>
                                     </thead>
@@ -264,14 +229,15 @@ export default function ReportView() {
                                                 <td className="px-4 py-4 text-sm font-medium">
                                                     {format(new Date(booking.startTime), "d MMM yyyy", { locale: id })}
                                                 </td>
-                                                <td className="px-4 py-4 text-sm font-semibold text-text-dark">
-                                                    {booking.room.name}
-                                                </td>
-                                                <td className="px-4 py-4 text-sm max-w-[200px] truncate" title={booking.title}>
-                                                    {booking.title}
+                                                <td className="px-4 py-4 text-sm">
+                                                    <div className="font-semibold text-text-dark">{booking.vehicle.name}</div>
+                                                    <div className="text-xs text-text-light">{booking.vehicle.licensePlate}</div>
                                                 </td>
                                                 <td className="px-4 py-4 text-sm">
                                                     {booking.user.name}
+                                                </td>
+                                                <td className="px-4 py-4 text-sm max-w-[200px] truncate" title={booking.destination}>
+                                                    {booking.destination}
                                                 </td>
                                                 <td className="px-4 py-4">
                                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :

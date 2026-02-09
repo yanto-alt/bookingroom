@@ -21,9 +21,14 @@ export default function VehicleBookingForm({ vehicles }) {
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData.entries());
 
-        // Construct ISO string from separate date, hour, and minute
-        const startDateTime = `${data.date}T${data.startHour}:${data.startMinute}:00`;
-        const endDateTime = `${data.date}T${data.endHour}:${data.endMinute}:00`;
+        // Construct Date objects from separate parts to ensure local time interpretation
+        const startDateObj = new Date(data.startDate);
+        startDateObj.setHours(parseInt(data.startHour), parseInt(data.startMinute), 0, 0);
+        const startDateTime = startDateObj.toISOString();
+
+        const endDateObj = new Date(data.endDate);
+        endDateObj.setHours(parseInt(data.endHour), parseInt(data.endMinute), 0, 0);
+        const endDateTime = endDateObj.toISOString();
 
         try {
             const res = await fetch("/api/vehicles/book", {
@@ -80,79 +85,101 @@ export default function VehicleBookingForm({ vehicles }) {
                 </select>
             </div>
 
-            {/* Date Selection */}
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Calendar size={16} />
-                    Tanggal Pemakaian
-                </label>
-                <input
-                    type="date"
-                    name="date"
-                    required
-                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white"
-                />
-            </div>
-
-            {/* Time Selection Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Start Time */}
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Clock size={16} />
+            {/* Date-Time Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                {/* Start Point */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
                         Waktu Mulai
-                    </label>
-                    <div className="flex gap-2">
-                        <select
-                            name="startHour"
+                    </h3>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                            <Calendar size={14} /> Tanggal
+                        </label>
+                        <input
+                            type="date"
+                            name="startDate"
                             required
-                            className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white"
-                        >
-                            <option value="">Jam</option>
-                            {hours.map((h) => (
-                                <option key={`start-h-${h}`} value={h}>{h}</option>
-                            ))}
-                        </select>
-                        <select
-                            name="startMinute"
-                            required
-                            className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white"
-                        >
-                            <option value="">Menit</option>
-                            {minutes.map((m) => (
-                                <option key={`start-m-${m}`} value={m}>{m}</option>
-                            ))}
-                        </select>
+                            className="w-full p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                            <Clock size={14} /> Jam
+                        </label>
+                        <div className="flex gap-2">
+                            <select
+                                name="startHour"
+                                required
+                                className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                            >
+                                <option value="">Jam</option>
+                                {hours.map((h) => (
+                                    <option key={`start-h-${h}`} value={h}>{h}</option>
+                                ))}
+                            </select>
+                            <select
+                                name="startMinute"
+                                required
+                                className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                            >
+                                <option value="">Menit</option>
+                                {minutes.map((m) => (
+                                    <option key={`start-m-${m}`} value={m}>{m}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                {/* End Time */}
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Clock size={16} />
+                {/* End Point */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
                         Waktu Selesai
-                    </label>
-                    <div className="flex gap-2">
-                        <select
-                            name="endHour"
+                    </h3>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                            <Calendar size={14} /> Tanggal
+                        </label>
+                        <input
+                            type="date"
+                            name="endDate"
                             required
-                            className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white"
-                        >
-                            <option value="">Jam</option>
-                            {hours.map((h) => (
-                                <option key={`end-h-${h}`} value={h}>{h}</option>
-                            ))}
-                        </select>
-                        <select
-                            name="endMinute"
-                            required
-                            className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white"
-                        >
-                            <option value="">Menit</option>
-                            {minutes.map((m) => (
-                                <option key={`end-m-${m}`} value={m}>{m}</option>
-                            ))}
-                        </select>
+                            className="w-full p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                            <Clock size={14} /> Jam
+                        </label>
+                        <div className="flex gap-2">
+                            <select
+                                name="endHour"
+                                required
+                                className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                            >
+                                <option value="">Jam</option>
+                                {hours.map((h) => (
+                                    <option key={`end-h-${h}`} value={h}>{h}</option>
+                                ))}
+                            </select>
+                            <select
+                                name="endMinute"
+                                required
+                                className="flex-1 p-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent focus:border-accent bg-white text-sm"
+                            >
+                                <option value="">Menit</option>
+                                {minutes.map((m) => (
+                                    <option key={`end-m-${m}`} value={m}>{m}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

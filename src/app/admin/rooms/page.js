@@ -8,7 +8,7 @@ import DeleteRoomButton from "@/components/DeleteRoomButton";
 export default async function AdminRoomsPage() {
     const session = await auth();
 
-    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA')) {
+    if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'PENGELOLA_ROOM')) {
         redirect("/");
     }
 

@@ -3,11 +3,12 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Car, Edit, Trash2 } from "lucide-react";
+import DeleteVehicleButton from "@/components/DeleteVehicleButton";
 
 export default async function AdminVehicles() {
     const session = await auth();
 
-    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "PENGELOLA")) {
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "PENGELOLA_VEHICLE")) {
         redirect("/");
     }
 
@@ -40,6 +41,7 @@ export default async function AdminVehicles() {
                                 <th className="px-6 py-4">Nama Kendaraan</th>
                                 <th className="px-6 py-4">Tipe</th>
                                 <th className="px-6 py-4">Plat Nomor</th>
+                                <th className="px-6 py-4">Nama Driver</th>
                                 <th className="px-6 py-4">Kapasitas</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 text-right">Aksi</th>
@@ -56,6 +58,7 @@ export default async function AdminVehicles() {
                                     </td>
                                     <td className="px-6 py-4 text-gray-600">{vehicle.type}</td>
                                     <td className="px-6 py-4 font-mono text-gray-600">{vehicle.licensePlate}</td>
+                                    <td className="px-6 py-4 text-gray-600">{vehicle.driverName || "-"}</td>
                                     <td className="px-6 py-4 text-gray-600">{vehicle.capacity} orang</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${vehicle.status === 'AVAILABLE' ? 'bg-green-100 text-green-600' :
@@ -66,10 +69,14 @@ export default async function AdminVehicles() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            {/* Edit and Delete buttons could go here */}
-                                            <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <Link
+                                                href={`/admin/vehicles/${vehicle.id}/edit`}
+                                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Edit Kendaraan"
+                                            >
                                                 <Edit size={16} />
-                                            </button>
+                                            </Link>
+                                            <DeleteVehicleButton vehicleId={vehicle.id} />
                                         </div>
                                     </td>
                                 </tr>
