@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Calendar, Clock, Users, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Users, CheckCircle, XCircle, AlertCircle, FileText } from "lucide-react";
 
 export default async function Dashboard() {
   const session = await auth();
@@ -159,9 +159,18 @@ export default async function Dashboard() {
                       <h3 className="font-semibold">{booking.title}</h3>
                     </div>
                     <p className="text-sm text-text-light">{booking.room.name}</p>
-                    <p className="text-xs text-text-light mt-1">
+                    <p className="text-xs text-text-light mt-1 mb-2">
                       {start.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' })} - {isSameDay ? end.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', timeStyle: 'short' }) : end.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' })}
                     </p>
+
+                    {booking.notes && (
+                      <div className="mt-2 text-xs bg-gray-50 p-2 rounded border border-gray-100">
+                        <p className="flex items-start gap-1 text-gray-700">
+                          <span className="font-semibold min-w-fit">Catatan:</span>
+                          <span className="italic">{booking.notes}</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :
                     booking.status === 'REJECTED' ? 'bg-red-100 text-red-600' :

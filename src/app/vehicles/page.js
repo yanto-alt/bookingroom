@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Calendar, Plus, Car, Clock } from "lucide-react";
+import { Calendar, Plus, Car, Clock, User, Users } from "lucide-react";
 import VehicleHistoryList from "@/components/VehicleHistoryList";
 
 export default async function VehicleDashboard() {
@@ -59,11 +59,22 @@ export default async function VehicleDashboard() {
                                     {vehicle.status}
                                 </span>
                             </div>
-                            <p className="text-sm font-medium text-gray-600">{vehicle.type} • {vehicle.licensePlate}</p>
-                            <p className="text-sm text-text-light mt-1 mb-3">{vehicle.description}</p>
-                            <div className="flex items-center gap-2 text-sm text-text-light">
-                                <Users size={16} />
-                                <span>Kapasitas: {vehicle.capacity} orang</span>
+                            <p className="text-sm font-medium text-gray-600 mb-1">{vehicle.type}</p>
+                            <p className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded inline-block mb-3 font-mono">
+                                {vehicle.licensePlate}
+                            </p>
+
+                            <p className="text-sm text-text-light mb-3">{vehicle.description}</p>
+
+                            <div className="space-y-2 pt-3 border-t border-gray-100">
+                                <div className="flex items-center gap-2 text-sm text-text-light">
+                                    <Users size={16} />
+                                    <span>Kapasitas: {vehicle.capacity} orang</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-text-light">
+                                    <User size={16} />
+                                    <span>Driver: {vehicle.driverName || "-"}</span>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -87,24 +98,4 @@ export default async function VehicleDashboard() {
     );
 }
 
-function Users({ size, className }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={className}
-        >
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-    )
-}
+

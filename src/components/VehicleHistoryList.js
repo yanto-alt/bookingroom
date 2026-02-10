@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Users, User } from "lucide-react";
+import { Clock, Users, User, FileText, Car } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
@@ -14,6 +14,12 @@ export default function VehicleHistoryList({ bookings }) {
             {bookings.map((booking) => (
                 <div key={booking.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center justify-between hover:shadow-md transition-shadow">
                     <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-gray-800">{booking.vehicle.name}</h4>
+                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded border border-gray-200 font-mono">
+                                {booking.vehicle.licensePlate}
+                            </span>
+                        </div>
                         <p className="text-sm text-gray-600 font-medium">
                             {format(new Date(booking.startTime), "EEEE, d MMMM yyyy HH:mm", { locale: id })} - {format(new Date(booking.endTime), "HH:mm", { locale: id })}
                         </p>
