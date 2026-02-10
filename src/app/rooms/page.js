@@ -155,7 +155,7 @@ export default async function Dashboard() {
                   </div>
                   <p className="text-sm text-text-light">{booking.room.name}</p>
                   <p className="text-xs text-text-light mt-1">
-                    {new Date(booking.startTime).toLocaleString('id-ID')} - {new Date(booking.endTime).toLocaleTimeString('id-ID')}
+                    {new Date(booking.startTime).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} - {new Date(booking.endTime).toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}
                   </p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :
