@@ -146,27 +146,33 @@ export default async function Dashboard() {
           <p className="text-text-light text-center py-8">Belum ada pemesanan</p>
         ) : (
           <div className="space-y-3">
-            {userBookings.map((booking) => (
-              <div key={booking.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    {getStatusIcon(booking.status)}
-                    <h3 className="font-semibold">{booking.title}</h3>
+            {userBookings.map((booking) => {
+              const start = new Date(booking.startTime);
+              const end = new Date(booking.endTime);
+              const isSameDay = start.toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' }) === end.toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
+
+              return (
+                <div key={booking.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center justify-between hover:shadow-md transition-shadow">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {getStatusIcon(booking.status)}
+                      <h3 className="font-semibold">{booking.title}</h3>
+                    </div>
+                    <p className="text-sm text-text-light">{booking.room.name}</p>
+                    <p className="text-xs text-text-light mt-1">
+                      {start.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' })} - {isSameDay ? end.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', timeStyle: 'short' }) : end.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' })}
+                    </p>
                   </div>
-                  <p className="text-sm text-text-light">{booking.room.name}</p>
-                  <p className="text-xs text-text-light mt-1">
-                    {new Date(booking.startTime).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} - {new Date(booking.endTime).toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })}
-                  </p>
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :
+                    booking.status === 'REJECTED' ? 'bg-red-100 text-red-600' :
+                      booking.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600' :
+                        'bg-gray-100 text-gray-600'
+                    }`}>
+                    {booking.status}
+                  </span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'APPROVED' ? 'bg-green-100 text-green-600' :
-                  booking.status === 'REJECTED' ? 'bg-red-100 text-red-600' :
-                    booking.status === 'PENDING' ? 'bg-yellow-100 text-yellow-600' :
-                      'bg-gray-100 text-gray-600'
-                  }`}>
-                  {booking.status}
-                </span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

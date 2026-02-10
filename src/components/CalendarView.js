@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { id } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from "lucide-react";
 
@@ -18,9 +18,15 @@ export default function CalendarView({ bookings, rooms }) {
     );
 
     const getBookingsForDay = (day) => {
-        return filteredBookings.filter((booking) =>
-            isSameDay(new Date(booking.startTime), day)
-        );
+        return filteredBookings.filter((booking) => {
+            const start = new Date(booking.startTime);
+            const end = new Date(booking.endTime);
+            // Check if 'day' is within the start-end range (inclusive of days)
+            return isWithinInterval(day, {
+                start: startOfDay(start),
+                end: endOfDay(end)
+            });
+        });
     };
 
     const previousMonth = () => {
@@ -94,27 +100,33 @@ export default function CalendarView({ bookings, rooms }) {
                                     {format(day, "d")}
                                 </div>
                                 <div className="space-y-1">
-                                    {dayBookings.slice(0, 3).map((booking) => (
-                                        <div
-                                            key={booking.id}
-                                            className={`text-xs p-1.5 rounded ${booking.status === "APPROVED"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                                }`}
-                                            title={`${booking.title} - ${booking.room.name} (${booking.user.name})`}
-                                        >
-                                            <div className="font-semibold truncate">{booking.title}</div>
-                                            <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
-                                                <User size={10} className="inline" />
-                                                {booking.user?.name || "User"}
+                                    {dayBookings.slice(0, 3).map((booking) => {
+                                        const start = new Date(booking.startTime);
+                                        const end = new Date(booking.endTime);
+                                        const isMultiDay = !isSameDay(start, end);
+
+                                        return (
+                                            <div
+                                                key={booking.id}
+                                                className={`text-xs p-1.5 rounded ${booking.status === "APPROVED"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-yellow-100 text-yellow-700"
+                                                    }`}
+                                                title={`${booking.title} - ${booking.room.name} (${booking.user.name})`}
+                                            >
+                                                <div className="font-semibold truncate">{booking.title}</div>
+                                                <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
+                                                    <User size={10} className="inline" />
+                                                    {booking.user?.name || "User"}
+                                                </div>
+                                                <div className="text-[10px] truncate">{booking.room.name}</div>
+                                                <div className="text-[10px] flex items-center gap-1">
+                                                    <Clock size={10} />
+                                                    {start.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })} - {isMultiDay ? end.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : end.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })}
+                                                </div>
                                             </div>
-                                            <div className="text-[10px] truncate">{booking.room.name}</div>
-                                            <div className="text-[10px] flex items-center gap-1">
-                                                <Clock size={10} />
-                                                {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                     {dayBookings.length > 3 && (
                                         <div className="text-xs text-text-light text-center">
                                             +{dayBookings.length - 3} lainnya

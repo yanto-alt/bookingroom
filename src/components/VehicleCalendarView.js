@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { id } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, User, Clock } from "lucide-react";
 
 export default function VehicleCalendarView({ bookings, vehicles }) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -21,12 +21,11 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
         return filteredBookings.filter((booking) => {
             const start = new Date(booking.startTime);
             const end = new Date(booking.endTime);
-            // Normalize dates to start of day for comparison
-            const checkDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-            const bookingStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-            const bookingEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-
-            return checkDay >= bookingStart && checkDay <= bookingEnd;
+            // Check if 'day' is within the start-end range (inclusive of days)
+            return isWithinInterval(day, {
+                start: startOfDay(start),
+                end: endOfDay(end)
+            });
         });
     };
 
@@ -101,26 +100,33 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
                                     {format(day, "d")}
                                 </div>
                                 <div className="space-y-1">
-                                    {dayBookings.slice(0, 3).map((booking) => (
-                                        <div
-                                            key={booking.id}
-                                            className={`text-xs p-1 rounded ${booking.status === "APPROVED"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                                }`}
-                                            title={`${booking.purpose} - ${booking.vehicle.name} (${booking.vehicle.licensePlate})`}
-                                        >
-                                            <div className="font-semibold truncate">{booking.purpose}</div>
-                                            <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
-                                                <User size={10} className="inline" />
-                                                {booking.user?.name || "User"}
+                                    {dayBookings.slice(0, 3).map((booking) => {
+                                        const start = new Date(booking.startTime);
+                                        const end = new Date(booking.endTime);
+                                        const isMultiDay = !isSameDay(start, end);
+
+                                        return (
+                                            <div
+                                                key={booking.id}
+                                                className={`text-xs p-1 rounded ${booking.status === "APPROVED"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-yellow-100 text-yellow-700"
+                                                    }`}
+                                                title={`${booking.purpose} - ${booking.vehicle.name} (${booking.vehicle.licensePlate})`}
+                                            >
+                                                <div className="font-semibold truncate">{booking.purpose}</div>
+                                                <div className="text-[10px] truncate font-medium text-gray-700 flex items-center gap-1">
+                                                    <User size={10} className="inline" />
+                                                    {booking.user?.name || "User"}
+                                                </div>
+                                                <div className="text-[10px] truncate">{booking.vehicle.name} ({booking.vehicle.licensePlate})</div>
+                                                <div className="text-[10px] flex items-center gap-1">
+                                                    <Clock size={10} />
+                                                    {start.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })} - {isMultiDay ? end.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : end.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })}
+                                                </div>
                                             </div>
-                                            <div className="text-[10px] truncate">{booking.vehicle.name} ({booking.vehicle.licensePlate})</div>
-                                            <div className="text-[10px]">
-                                                {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                     {dayBookings.length > 3 && (
                                         <div className="text-xs text-text-light text-center">
                                             +{dayBookings.length - 3} lainnya
