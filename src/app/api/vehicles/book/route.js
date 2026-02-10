@@ -12,7 +12,7 @@ export async function POST(request) {
         }
 
         const body = await request.json();
-        const { vehicleId, startTime, endTime, purpose, destination, driverRequired } = body;
+        const { vehicleId, startTime, endTime, purpose, destination, serviceType } = body;
 
         // Create booking
         const booking = await prisma.vehicleBooking.create({
@@ -23,7 +23,8 @@ export async function POST(request) {
                 endTime: new Date(endTime),
                 purpose,
                 destination,
-                driverRequired: driverRequired || false,
+                driverRequired: true, // Always true per new requirement
+                serviceType: serviceType || 'STANDBY', // Default to STANDBY if missing
                 status: 'PENDING',
             },
         });

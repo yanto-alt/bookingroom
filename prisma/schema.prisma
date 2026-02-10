@@ -78,8 +78,9 @@ model VehicleBooking {
   endTime        DateTime
   purpose        String
   destination    String
-  driverRequired Boolean       @default(false)
+  driverRequired Boolean       @default(true)
   status         BookingStatus @default(PENDING)
+  serviceType    ServiceType   @default(STANDBY)
   adminNotes     String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -99,4 +100,9 @@ enum BookingStatus {
   APPROVED
   REJECTED
   CANCELLED
+}
+
+enum ServiceType {
+  DROP_OFF
+  STANDBY
 }

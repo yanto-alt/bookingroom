@@ -119,6 +119,12 @@ export default function VehicleApprovalList({ bookings }) {
                                         Tujuan: <span className="font-medium text-text-dark">{booking.destination}</span>
                                     </p>
 
+                                    <p className="flex items-center gap-2">
+                                        <Clock size={16} className="text-gray-400" />
+                                        Layanan: <span className={`px-2 py-0.5 rounded text-xs font-bold ${booking.serviceType === 'DROP_OFF' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                            }`}>{booking.serviceType === 'DROP_OFF' ? 'DROP OFF' : 'STANDBY'}</span>
+                                    </p>
+
                                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 mt-2">
                                         <p className="text-xs text-text-light uppercase font-bold tracking-wider mb-1">Keperluan</p>
                                         <p className="text-sm text-text-dark">{booking.purpose}</p>

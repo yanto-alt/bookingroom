@@ -120,6 +120,9 @@ export default function VehicleCalendarView({ bookings, vehicles }) {
                                                     {booking.user?.name || "User"}
                                                 </div>
                                                 <div className="text-[10px] truncate">{booking.vehicle.name} ({booking.vehicle.licensePlate})</div>
+                                                <div className="text-[10px] truncate font-bold text-blue-700">
+                                                    {booking.serviceType === 'DROP_OFF' ? 'DROP OFF' : 'STANDBY'}
+                                                </div>
                                                 <div className="text-[10px] flex items-center gap-1">
                                                     <Clock size={10} />
                                                     {start.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })} - {isMultiDay ? end.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : end.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })}

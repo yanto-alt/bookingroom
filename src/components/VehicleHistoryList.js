@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Users, User, FileText, Car } from "lucide-react";
+import { Clock, Users, User, FileText, Car, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
@@ -29,6 +29,13 @@ export default function VehicleHistoryList({ bookings }) {
                         </p>
                         <div className="flex flex-col gap-1 mt-1 bg-gray-50 p-2 rounded border border-gray-100">
                             <p className="text-xs text-text-light flex items-center gap-1">
+                                <span className="font-semibold text-gray-700">Layanan:</span>
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${booking.serviceType === 'DROP_OFF' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                    }`}>
+                                    {booking.serviceType === 'DROP_OFF' ? 'DROP OFF' : 'STANDBY'}
+                                </span>
+                            </p>
+                            <p className="text-xs text-text-light flex items-center gap-1">
                                 <span className="font-semibold text-gray-700">Driver:</span> {booking.vehicle.driverName || "Tidak ditentukan"}
                             </p>
                             <p className="text-xs text-text-light flex items-center gap-1">
@@ -44,7 +51,7 @@ export default function VehicleHistoryList({ bookings }) {
                             )}
                             <div className="mt-1 pt-1 border-t border-gray-200">
                                 <p className="text-[10px] text-gray-400 italic">
-                                    Status: {booking.status} • Butuh Supir: {booking.driverRequired ? "Ya" : "Tidak"}
+                                    Status: {booking.status}
                                 </p>
                             </div>
                         </div>
@@ -56,11 +63,6 @@ export default function VehicleHistoryList({ bookings }) {
                             }`}>
                             {booking.status}
                         </span>
-                        {booking.driverRequired && (
-                            <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 font-medium">
-                                Butuh Supir
-                            </span>
-                        )}
                     </div>
                 </div>
             ))}

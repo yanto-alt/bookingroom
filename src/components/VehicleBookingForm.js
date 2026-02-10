@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, MapPin, Clock, Info, User as UserIcon } from "lucide-react";
+import { Calendar, MapPin, Clock, Info, User as UserIcon, Shield } from "lucide-react";
 
 export default function VehicleBookingForm({ vehicles }) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
+    const [serviceType, setServiceType] = useState("STANDBY");
 
     // Generate hour and minute options
     const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
@@ -39,7 +40,8 @@ export default function VehicleBookingForm({ vehicles }) {
                     endTime: endDateTime,
                     purpose: data.purpose,
                     destination: data.destination,
-                    driverRequired: data.driverRequired === "on",
+                    driverRequired: true, // Always true
+                    serviceType: serviceType,
                 }),
                 headers: {
                     "Content-Type": "application/json",
@@ -214,18 +216,53 @@ export default function VehicleBookingForm({ vehicles }) {
                 />
             </div>
 
-            {/* Driver Option */}
-            <div className="flex items-center gap-2">
-                <input
-                    type="checkbox"
-                    name="driverRequired"
-                    id="driverRequired"
-                    className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent"
-                />
-                <label htmlFor="driverRequired" className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer">
-                    <UserIcon size={16} />
-                    Butuh Supir?
+            {/* Service Type - Replaces Driver Option */}
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Shield size={16} />
+                    Layanan Driver
                 </label>
+                <div className="grid grid-cols-2 gap-4">
+                    <label className={`
+                        flex items-center justify-center gap-2 p-3 rounded-lg border cursor-pointer transition-all
+                        ${serviceType === 'DROP_OFF'
+                            ? 'bg-accent/10 border-accent text-accent ring-1 ring-accent'
+                            : 'bg-white border-gray-300 hover:bg-gray-50'}
+                    `}>
+                        <input
+                            type="radio"
+                            name="serviceType"
+                            value="DROP_OFF"
+                            checked={serviceType === 'DROP_OFF'}
+                            onChange={(e) => setServiceType(e.target.value)}
+                            className="sr-only"
+                        />
+                        <div className="text-center">
+                            <span className="font-semibold block">Drop Off</span>
+                            <span className="text-xs opacity-75">Antar saja</span>
+                        </div>
+                    </label>
+
+                    <label className={`
+                        flex items-center justify-center gap-2 p-3 rounded-lg border cursor-pointer transition-all
+                        ${serviceType === 'STANDBY'
+                            ? 'bg-accent/10 border-accent text-accent ring-1 ring-accent'
+                            : 'bg-white border-gray-300 hover:bg-gray-50'}
+                    `}>
+                        <input
+                            type="radio"
+                            name="serviceType"
+                            value="STANDBY"
+                            checked={serviceType === 'STANDBY'}
+                            onChange={(e) => setServiceType(e.target.value)}
+                            className="sr-only"
+                        />
+                        <div className="text-center">
+                            <span className="font-semibold block">Standby</span>
+                            <span className="text-xs opacity-75">Tunggu di lokasi</span>
+                        </div>
+                    </label>
+                </div>
             </div>
 
             <div className="pt-4">
