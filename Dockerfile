@@ -1,4 +1,17 @@
 FROM node:25-alpine AS base
+FROM node:25-alpine
+
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+ENV HTTP_PROXY=$HTTP_PROXY
+ENV HTTPS_PROXY=$HTTPS_PROXY
+
+# 🔥 FIX TLS PROXY: force HTTP repo
+RUN sed -i 's|https://dl-cdn.alpinelinux.org|http://dl-cdn.alpinelinux.org|g' /etc/apk/repositories
+
+RUN apk update
+RUN apk add --no-cache libc6-compat openssl
 
 # Install dependencies only when needed
 FROM base AS deps
