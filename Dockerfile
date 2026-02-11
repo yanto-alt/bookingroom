@@ -1,5 +1,9 @@
 FROM node:25-alpine AS base
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
 
+ENV HTTP_PROXY=$HTTP_PROXY
+ENV HTTPS_PROXY=$HTTPS_PROXY
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat openssl
