@@ -19,8 +19,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const user = await prisma.user.findFirst({
                     where: {
                         OR: [
-                            { email: credentials.email },
-                            { username: credentials.email } // Front end sends input as 'email' field in credentials object
+                            { email: { equals: credentials.email, mode: 'insensitive' } },
+                            { username: { equals: credentials.email, mode: 'insensitive' } }
                         ]
                     },
                 })

@@ -40,3 +40,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - default
+      - ldap_network
+
+networks:
+  ldap_network:
+    external: true
+    name: ldap_ldap_network

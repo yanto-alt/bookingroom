@@ -11,7 +11,7 @@ const nextConfig = {
     buildActivity: false,
     appIsrStatus: false,
   },
-  serverComponentsExternalPackages: ['bcryptjs'],
+  serverComponentsExternalPackages: ['bcryptjs', 'ldapjs-promise', 'ldapjs'],
 };
 
 export default nextConfig;
