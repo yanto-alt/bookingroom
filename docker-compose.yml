@@ -2,6 +2,13 @@
 # Untuk development, gunakan: docker-compose -f docker-compose.dev.yml up
 
 version: '3.8'
+app:
+  build:
+    context: .
+    args:
+      HTTP_PROXY: http://proxywisma01.tapera.go.id:8080
+      HTTPS_PROXY: http://proxywisma01.tapera.go.id:8080
+  container_name: bookingroom_app
 
 services:
   db:
